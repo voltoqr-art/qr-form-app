@@ -38,7 +38,7 @@
     .action-details { flex: 1; padding-left: 5px; }
     .action-title { font-size: 10px; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: 0.5px; }
     .action-value { font-size: 15px; font-weight: 600; color: #1a202c; text-decoration: none; word-break: break-all; }
-    .btn-action { padding: 8px 18px; border-radius: 8px; color: #fff; font-weight: 700; font-size: 13px; text-decoration: none; display: inline-block; }
+    .btn-action { padding: 8px 18px; border-radius: 8px; color: #fff; font-weight: 700; font-size: 13px; text-decoration: none; display: inline-block; cursor: pointer; border: none; }
     .btn-call { background: #0066eb; }
     .btn-chat { background: #25d366; }
     .btn-facebook { background: #1877f2; }
@@ -47,6 +47,7 @@
     .btn-maps { background: #ea4335; }
     .btn-website { background: #4a5568; }
     .btn-instapay { background: #0066eb; }
+    .btn-copy { background: #4a5568; }
 
     .main-call-btn { display: block; width: 100%; padding: 16px; background: #0066eb; color: #fff; text-align: center; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 17px; margin-top: 10px; }
     .hidden { display: none !important; }
@@ -209,6 +210,7 @@
             <div class="action-title">E-WALLET</div>
             <div id="viewEwallet" class="action-value"></div>
           </div>
+          <button id="copyEwalletBtn" onclick="copyEwalletNumber()" class="btn-action btn-copy">Copy</button>
         </div>
 
         <a id="mainCallBtn" href="#" class="main-call-btn">Call</a>
@@ -259,7 +261,6 @@
         document.getElementById('whatsappRow').classList.remove('hidden');
         document.getElementById('viewWhatsapp').innerText = data.whatsapp;
         
-        // Format WhatsApp to wa.me with Country Code 20 (Egypt) if starting with 01
         let waDigits = data.whatsapp.replace(/[^0-9]/g, '');
         if (waDigits.startsWith('01')) {
           waDigits = '20' + waDigits.substring(1);
@@ -306,6 +307,19 @@
         document.getElementById('ewalletRow').classList.remove('hidden');
         document.getElementById('viewEwallet').innerText = data.ewallet;
       }
+    }
+
+    function copyEwalletNumber() {
+      const ewalletNum = document.getElementById('viewEwallet').innerText;
+      navigator.clipboard.writeText(ewalletNum).then(() => {
+        const btn = document.getElementById('copyEwalletBtn');
+        btn.innerText = 'Copied!';
+        btn.style.backgroundColor = '#108e53';
+        setTimeout(() => {
+          btn.innerText = 'Copy';
+          btn.style.backgroundColor = '#4a5568';
+        }, 2000);
+      });
     }
 
     document.getElementById('contactForm').addEventListener('submit', async (e) => {
