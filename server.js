@@ -36,18 +36,20 @@ app.get('/api/user/:uid', async (req, res) => {
 app.post('/api/user', async (req, res) => {
   try {
     const { 
-      uid, name, phone, whatsapp, 
+      uid, business_name, contact_name, phone, whatsapp, 
       facebook, instagram, tiktok, 
       google_maps, website, instapay, ewallet 
     } = req.body;
 
-    if (!uid || !name || !phone) {
+    if (!uid || !phone) {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
 
     const payload = {
       uid,
-      name,
+      name: business_name || contact_name || 'Digital Card', // Fallback for legacy compatibility
+      business_name: business_name || '',
+      contact_name: contact_name || '',
       phone,
       whatsapp: whatsapp || '',
       facebook: facebook || '',
