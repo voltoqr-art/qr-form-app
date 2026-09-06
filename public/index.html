@@ -3,47 +3,229 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Information Form</title>
+  <title>Digital Contact Card</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { font-family: Arial, sans-serif; max-width: 400px; margin: 40px auto; padding: 0 20px; }
-    .form-group { margin-bottom: 15px; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; }
-    input { width: 100%; padding: 8px; box-sizing: border-box; }
-    button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; font-size: 16px; cursor: pointer; }
-    button:hover { background-color: #0056b3; }
-    .status { margin-top: 15px; font-weight: bold; text-align: center; }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: #f4f6f8; margin: 0; padding: 20px 10px; display: flex; justify-content: center; }
+    .card-container { width: 100%; max-width: 420px; background: #fff; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); overflow: hidden; }
+    
+    /* Header Styles */
+    .card-header { padding: 25px 20px; text-align: center; }
+    .registration-header h2 { margin: 0 0 5px 0; font-size: 22px; color: #111; }
+    .registration-header p { margin: 0; font-size: 13px; color: #666; }
+    .view-header { background: #0066eb; color: #fff; padding: 30px 20px; text-align: center; }
+    .view-header h1 { margin: 0; font-size: 26px; font-weight: 700; }
+
+    /* Form Mode Styles */
+    .form-body { padding: 0 20px 25px 20px; }
+    .section-divider { display: flex; align-items: center; margin: 20px 0 15px 0; font-size: 11px; font-weight: 700; color: #888; letter-spacing: 0.5px; }
+    .section-divider::after { content: ""; flex: 1; margin-left: 10px; height: 1px; background: #eee; }
+    .field-group { margin-bottom: 14px; }
+    .field-label { display: flex; align-items: center; font-size: 11px; font-weight: 700; color: #444; margin-bottom: 6px; text-transform: uppercase; }
+    .field-label i { margin-right: 8px; font-size: 14px; width: 16px; text-align: center; }
+    .field-label .required { color: #e53e3e; margin-left: 3px; }
+    .field-label .optional { margin-left: auto; color: #a0aec0; font-weight: normal; text-transform: none; }
+    .input-box { width: 100%; padding: 12px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; color: #2d3748; outline: none; transition: all 0.2s; }
+    .input-box:focus { border-color: #0066eb; background: #fff; }
+    .submit-btn { width: 100%; padding: 14px; background: #108e53; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 15px; }
+    .submit-btn:hover { background: #0c7343; }
+
+    /* View Mode Styles */
+    .view-body { padding: 20px; background: #fff; }
+    .action-item { display: flex; align-items: center; background: #f8fafc; border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; }
+    .action-icon { font-size: 20px; width: 35px; }
+    .action-details { flex: 1; padding-left: 5px; }
+    .action-title { font-size: 10px; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: 0.5px; }
+    .action-value { font-size: 15px; font-weight: 600; color: #1a202c; text-decoration: none; word-break: break-all; }
+    .btn-action { padding: 8px 18px; border-radius: 8px; color: #fff; font-weight: 700; font-size: 13px; text-decoration: none; display: inline-block; }
+    .btn-call { background: #0066eb; }
+    .btn-chat { background: #25d366; }
+    .btn-facebook { background: #1877f2; }
+    .btn-instagram { background: #e1306c; }
+    .btn-tiktok { background: #000000; }
+    .btn-maps { background: #ea4335; }
+    .btn-website { background: #4a5568; }
+    .btn-instapay { background: #0066eb; }
+
+    .main-call-btn { display: block; width: 100%; padding: 16px; background: #0066eb; color: #fff; text-align: center; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 17px; margin-top: 10px; }
+    .hidden { display: none !important; }
+    .status-msg { text-align: center; padding: 10px; font-weight: 600; font-size: 14px; }
   </style>
 </head>
 <body>
 
-  <h2>User Registration</h2>
-  <form id="profileForm">
-    <div class="form-group">
-      <label for="name">Full Name</label>
-      <input type="text" id="name" required>
-    </div>
-    <div class="form-group">
-      <label for="phone">Phone Number</label>
-      <input type="tel" id="phone" required>
-    </div>
-    <div class="form-group">
-      <label for="socials">Social Media Links</label>
-      <input type="text" id="socials" placeholder="e.g. @instagram / linkedin">
-    </div>
-    <button type="submit">Submit Data</button>
-  </form>
+  <div class="card-container">
+    <div id="statusMessage" class="status-msg hidden"></div>
 
-  <div id="statusMessage" class="status"></div>
+    <!-- REGISTER MODE -->
+    <div id="registerMode" class="hidden">
+      <div class="card-header registration-header">
+        <h2>Register Contact Card</h2>
+        <p>Enter details below to assign them to this QR Code.</p>
+      </div>
+
+      <form id="contactForm" class="form-body">
+        <div class="section-divider">REQUIRED DETAILS</div>
+
+        <div class="field-group">
+          <div class="field-label"><i class="fa-solid fa-user" style="color: #0066eb;"></i> FULL NAME <span class="required">*</span></div>
+          <input type="text" id="name" class="input-box" placeholder="John Doe" required>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label"><i class="fa-solid fa-phone" style="color: #0066eb;"></i> PHONE NUMBER <span class="required">*</span></div>
+          <input type="tel" id="phone" class="input-box" placeholder="01xxxxxxxxx" required>
+        </div>
+
+        <div class="section-divider">OPTIONAL LINKS</div>
+
+        <div class="field-group">
+          <div class="field-label"><i class="fa-brands fa-whatsapp" style="color: #25d366;"></i> WHATSAPP NUMBER <span class="optional">(Optional)</span></div>
+          <input type="tel" id="whatsapp" class="input-box" placeholder="01xxxxxxxxx">
+        </div>
+
+        <div class="field-group">
+          <div class="field-label"><i class="fa-brands fa-facebook" style="color: #1877f2;"></i> FACEBOOK LINK <span class="optional">(Optional)</span></div>
+          <input type="url" id="facebook" class="input-box" placeholder="https://facebook.com/...">
+        </div>
+
+        <div class="field-group">
+          <div class="field-label"><i class="fa-brands fa-instagram" style="color: #e1306c;"></i> INSTAGRAM LINK <span class="optional">(Optional)</span></div>
+          <input type="url" id="instagram" class="input-box" placeholder="https://instagram.com/...">
+        </div>
+
+        <div class="field-group">
+          <div class="field-label"><i class="fa-brands fa-tiktok" style="color: #000;"></i> TIKTOK LINK <span class="optional">(Optional)</span></div>
+          <input type="url" id="tiktok" class="input-box" placeholder="https://tiktok.com/@...">
+        </div>
+
+        <div class="field-group">
+          <div class="field-label"><i class="fa-solid fa-location-dot" style="color: #ea4335;"></i> GOOGLE MAPS LINK <span class="optional">(Optional)</span></div>
+          <input type="url" id="google_maps" class="input-box" placeholder="https://maps.google.com/...">
+        </div>
+
+        <div class="field-group">
+          <div class="field-label"><i class="fa-solid fa-globe" style="color: #4a5568;"></i> WEBSITE URL <span class="optional">(Optional)</span></div>
+          <input type="url" id="website" class="input-box" placeholder="https://yourwebsite.com">
+        </div>
+
+        <div class="field-group">
+          <div class="field-label"><i class="fa-solid fa-credit-card" style="color: #0066eb;"></i> INSTAPAY LINK OR NUMBER <span class="optional">(Optional)</span></div>
+          <input type="text" id="instapay" class="input-box" placeholder="InstaPay Link or Mobile/IPA Number">
+        </div>
+
+        <div class="field-group">
+          <div class="field-label"><i class="fa-solid fa-wallet" style="color: #0066eb;"></i> E-WALLET NUMBER <span class="optional">(Optional)</span></div>
+          <input type="tel" id="ewallet" class="input-box" placeholder="01xxxxxxxxx">
+        </div>
+
+        <button type="submit" class="submit-btn">Save & Create Card</button>
+      </form>
+    </div>
+
+    <!-- VIEW MODE -->
+    <div id="viewMode" class="hidden">
+      <div class="view-header">
+        <h1 id="viewName">Card Title</h1>
+      </div>
+
+      <div class="view-body">
+        <div id="phoneRow" class="action-item hidden">
+          <div class="action-icon"><i class="fa-solid fa-phone" style="color: #0066eb;"></i></div>
+          <div class="action-details">
+            <div class="action-title">PHONE</div>
+            <div id="viewPhone" class="action-value"></div>
+          </div>
+          <a id="callBtn" href="#" class="btn-action btn-call">Call</a>
+        </div>
+
+        <div id="whatsappRow" class="action-item hidden">
+          <div class="action-icon"><i class="fa-brands fa-whatsapp" style="color: #25d366;"></i></div>
+          <div class="action-details">
+            <div class="action-title">WHATSAPP</div>
+            <div id="viewWhatsapp" class="action-value"></div>
+          </div>
+          <a id="whatsappBtn" href="#" target="_blank" class="btn-action btn-chat">Chat</a>
+        </div>
+
+        <div id="facebookRow" class="action-item hidden">
+          <div class="action-icon"><i class="fa-brands fa-facebook" style="color: #1877f2;"></i></div>
+          <div class="action-details">
+            <div class="action-title">FACEBOOK</div>
+            <div class="action-value">Profile Link</div>
+          </div>
+          <a id="facebookBtn" href="#" target="_blank" class="btn-action btn-facebook">Visit</a>
+        </div>
+
+        <div id="instagramRow" class="action-item hidden">
+          <div class="action-icon"><i class="fa-brands fa-instagram" style="color: #e1306c;"></i></div>
+          <div class="action-details">
+            <div class="action-title">INSTAGRAM</div>
+            <div class="action-value">Profile Link</div>
+          </div>
+          <a id="instagramBtn" href="#" target="_blank" class="btn-action btn-instagram">Visit</a>
+        </div>
+
+        <div id="tiktokRow" class="action-item hidden">
+          <div class="action-icon"><i class="fa-brands fa-tiktok" style="color: #000;"></i></div>
+          <div class="action-details">
+            <div class="action-title">TIKTOK</div>
+            <div class="action-value">Profile Link</div>
+          </div>
+          <a id="tiktokBtn" href="#" target="_blank" class="btn-action btn-tiktok">Visit</a>
+        </div>
+
+        <div id="mapsRow" class="action-item hidden">
+          <div class="action-icon"><i class="fa-solid fa-location-dot" style="color: #ea4335;"></i></div>
+          <div class="action-details">
+            <div class="action-title">LOCATION</div>
+            <div class="action-value">Google Maps</div>
+          </div>
+          <a id="mapsBtn" href="#" target="_blank" class="btn-action btn-maps">Maps</a>
+        </div>
+
+        <div id="websiteRow" class="action-item hidden">
+          <div class="action-icon"><i class="fa-solid fa-globe" style="color: #4a5568;"></i></div>
+          <div class="action-details">
+            <div class="action-title">WEBSITE</div>
+            <div id="viewWebsite" class="action-value">Visit Website</div>
+          </div>
+          <a id="websiteBtn" href="#" target="_blank" class="btn-action btn-website">Visit</a>
+        </div>
+
+        <div id="instapayRow" class="action-item hidden">
+          <div class="action-icon"><i class="fa-solid fa-credit-card" style="color: #0066eb;"></i></div>
+          <div class="action-details">
+            <div class="action-title">INSTAPAY</div>
+            <div id="viewInstapay" class="action-value"></div>
+          </div>
+          <a id="instapayBtn" href="#" target="_blank" class="btn-action btn-instapay hidden">Pay</a>
+        </div>
+
+        <div id="ewalletRow" class="action-item hidden">
+          <div class="action-icon"><i class="fa-solid fa-wallet" style="color: #0066eb;"></i></div>
+          <div class="action-details">
+            <div class="action-title">E-WALLET</div>
+            <div id="viewEwallet" class="action-value"></div>
+          </div>
+        </div>
+
+        <a id="mainCallBtn" href="#" class="main-call-btn">Call</a>
+      </div>
+    </div>
+  </div>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const userId = urlParams.get('uid');
     const statusDiv = document.getElementById('statusMessage');
 
-    async function initForm() {
+    async function init() {
       if (!userId) {
+        statusDiv.classList.remove('hidden');
         statusDiv.style.color = 'red';
-        statusDiv.innerText = 'Error: Missing user ID in URL.';
+        statusDiv.innerText = 'Error: Missing QR Code UID in URL.';
         return;
       }
 
@@ -51,28 +233,96 @@
         const response = await fetch(`/api/user/${userId}`);
         const result = await response.json();
 
-        if (result.success) {
-          document.getElementById('name').value = result.data.name;
-          document.getElementById('phone').value = result.data.phone;
-          document.getElementById('socials').value = result.data.socials;
-          statusDiv.style.color = 'green';
-          statusDiv.innerText = 'Welcome back! Your details have been auto-filled.';
+        if (result.success && result.data) {
+          renderCardView(result.data);
+        } else {
+          document.getElementById('registerMode').classList.remove('hidden');
         }
       } catch (err) {
-        console.log('New user profile or lookup failed.');
+        document.getElementById('registerMode').classList.remove('hidden');
       }
     }
 
-    document.getElementById('profileForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+    function renderCardView(data) {
+      document.getElementById('viewMode').classList.remove('hidden');
+      document.getElementById('viewName').innerText = data.name;
 
-      if (!userId) return alert('Cannot submit: Missing UID in URL.');
+      if (data.phone) {
+        document.getElementById('phoneRow').classList.remove('hidden');
+        document.getElementById('viewPhone').innerText = data.phone;
+        document.getElementById('callBtn').href = `tel:${data.phone}`;
+        document.getElementById('mainCallBtn').href = `tel:${data.phone}`;
+        document.getElementById('mainCallBtn').innerText = `Call ${data.name}`;
+      }
+
+      if (data.whatsapp) {
+        document.getElementById('whatsappRow').classList.remove('hidden');
+        document.getElementById('viewWhatsapp').innerText = data.whatsapp;
+        
+        // Format WhatsApp to wa.me with Country Code 20 (Egypt) if starting with 01
+        let waDigits = data.whatsapp.replace(/[^0-9]/g, '');
+        if (waDigits.startsWith('01')) {
+          waDigits = '20' + waDigits.substring(1);
+        }
+        document.getElementById('whatsappBtn').href = `https://wa.me/${waDigits}`;
+      }
+
+      if (data.facebook) {
+        document.getElementById('facebookRow').classList.remove('hidden');
+        document.getElementById('facebookBtn').href = data.facebook;
+      }
+
+      if (data.instagram) {
+        document.getElementById('instagramRow').classList.remove('hidden');
+        document.getElementById('instagramBtn').href = data.instagram;
+      }
+
+      if (data.tiktok) {
+        document.getElementById('tiktokRow').classList.remove('hidden');
+        document.getElementById('tiktokBtn').href = data.tiktok;
+      }
+
+      if (data.google_maps) {
+        document.getElementById('mapsRow').classList.remove('hidden');
+        document.getElementById('mapsBtn').href = data.google_maps;
+      }
+
+      if (data.website) {
+        document.getElementById('websiteRow').classList.remove('hidden');
+        document.getElementById('websiteBtn').href = data.website;
+      }
+
+      if (data.instapay) {
+        document.getElementById('instapayRow').classList.remove('hidden');
+        document.getElementById('viewInstapay').innerText = data.instapay;
+        if (data.instapay.startsWith('http://') || data.instapay.startsWith('https://')) {
+          const btn = document.getElementById('instapayBtn');
+          btn.href = data.instapay;
+          btn.classList.remove('hidden');
+        }
+      }
+
+      if (data.ewallet) {
+        document.getElementById('ewalletRow').classList.remove('hidden');
+        document.getElementById('viewEwallet').innerText = data.ewallet;
+      }
+    }
+
+    document.getElementById('contactForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
 
       const payload = {
         uid: userId,
         name: document.getElementById('name').value,
         phone: document.getElementById('phone').value,
-        socials: document.getElementById('socials').value
+        whatsapp: document.getElementById('whatsapp').value,
+        facebook: document.getElementById('facebook').value,
+        instagram: document.getElementById('instagram').value,
+        tiktok: document.getElementById('tiktok').value,
+        google_maps: document.getElementById('google_maps').value,
+        website: document.getElementById('website').value,
+        instapay: document.getElementById('instapay').value,
+        ewallet: document.getElementById('ewallet').value
       };
 
       try {
@@ -83,21 +333,17 @@
         });
 
         const result = await response.json();
-
         if (result.success) {
-          statusDiv.style.color = 'green';
-          statusDiv.innerText = 'Information saved successfully!';
+          window.location.reload();
         } else {
-          statusDiv.style.color = 'red';
-          statusDiv.innerText = 'Error: ' + result.message;
+          alert('Error: ' + result.message);
         }
       } catch (err) {
-        statusDiv.style.color = 'red';
-        statusDiv.innerText = 'Server error occurred while saving.';
+        alert('Server error while saving card details.');
       }
     });
 
-    initForm();
+    init();
   </script>
 </body>
 </html>
