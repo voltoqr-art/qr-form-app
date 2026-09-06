@@ -1,8 +1,8 @@
 const express = require('express');
-const Database = require('better-sqlite3');
 const cors = require('cors');
 const path = require('path');
 const QRCode = require('qrcode');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,46 +11,31 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const db = new Database('data.db');
-db.pragma('journal_mode = WAL');
+// Connect to Supabase (uses HTTP, compatible with Vercel)
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    uid TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    phone TEXT NOT NULL,
-    socials TEXT,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )
-`);
-
-const selectUserStmt = db.prepare('SELECT * FROM users WHERE uid = ?');
-const upsertUserStmt = db.prepare(`
-  INSERT INTO users (uid, name, phone, socials, updated_at)
-  VALUES (@uid, @name, @phone, @socials, CURRENT_TIMESTAMP)
-  ON CONFLICT(uid) DO UPDATE SET
-    name = excluded.name,
-    phone = excluded.phone,
-    socials = excluded.socials,
-    updated_at = CURRENT_TIMESTAMP
-`);
-
-app.get('/api/user/:uid', (req, res) => {
+app.get('/api/user/:uid', async (req, res) => {
   try {
     const { uid } = req.params;
-    const user = selectUserStmt.get(uid);
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('uid', uid)
+      .maybeSingle();
 
-    if (!user) {
+    if (error || !data) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    res.json({ success: true, data: user });
+    res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
-app.post('/api/user', (req, res) => {
+app.post('/api/user', async (req, res) => {
   try {
     const { uid, name, phone, socials } = req.body;
 
@@ -58,7 +43,14 @@ app.post('/api/user', (req, res) => {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
 
-    upsertUserStmt.run({ uid, name, phone, socials: socials || '' });
+    const { error } = await supabase
+      .from('users')
+      .upsert({ uid, name, phone, socials: socials || '' }, { onConflict: 'uid' });
+
+    if (error) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+
     res.json({ success: true, message: 'Data saved successfully' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error' });
@@ -76,6 +68,4 @@ app.get('/api/qr/:uid', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+module.exports = app;
