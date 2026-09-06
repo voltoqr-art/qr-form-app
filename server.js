@@ -5,13 +5,11 @@ const QRCode = require('qrcode');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Connect to Supabase (uses HTTP, compatible with Vercel)
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -37,15 +35,33 @@ app.get('/api/user/:uid', async (req, res) => {
 
 app.post('/api/user', async (req, res) => {
   try {
-    const { uid, name, phone, socials } = req.body;
+    const { 
+      uid, name, phone, whatsapp, 
+      facebook, instagram, tiktok, 
+      google_maps, website, instapay, ewallet 
+    } = req.body;
 
     if (!uid || !name || !phone) {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
 
+    const payload = {
+      uid,
+      name,
+      phone,
+      whatsapp: whatsapp || '',
+      facebook: facebook || '',
+      instagram: instagram || '',
+      tiktok: tiktok || '',
+      google_maps: google_maps || '',
+      website: website || '',
+      instapay: instapay || '',
+      ewallet: ewallet || ''
+    };
+
     const { error } = await supabase
       .from('users')
-      .upsert({ uid, name, phone, socials: socials || '' }, { onConflict: 'uid' });
+      .upsert(payload, { onConflict: 'uid' });
 
     if (error) {
       return res.status(500).json({ success: false, message: error.message });
