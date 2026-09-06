@@ -15,7 +15,7 @@
     .registration-header h2 { margin: 0 0 5px 0; font-size: 22px; color: #111; }
     .registration-header p { margin: 0; font-size: 13px; color: #666; }
     .view-header { background: #0066eb; color: #fff; padding: 30px 20px; text-align: center; }
-    .view-header h1 { margin: 0; font-size: 26px; font-weight: 700; }
+    .view-header h1 { margin: 0; font-size: 26px; font-weight: 700; word-break: break-word; }
 
     /* Form Mode Styles */
     .form-body { padding: 0 20px 25px 20px; }
@@ -70,8 +70,13 @@
         <div class="section-divider">REQUIRED DETAILS</div>
 
         <div class="field-group">
-          <div class="field-label"><i class="fa-solid fa-user" style="color: #0066eb;"></i> FULL NAME <span class="required">*</span></div>
-          <input type="text" id="name" class="input-box" placeholder="John Doe" required>
+          <div class="field-label"><i class="fa-solid fa-briefcase" style="color: #0066eb;"></i> BUSINESS NAME <span class="required">*</span></div>
+          <input type="text" id="business_name" class="input-box" placeholder="Company / Brand Name" required>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label"><i class="fa-solid fa-user" style="color: #0066eb;"></i> CONTACT NAME <span class="optional">(Optional)</span></div>
+          <input type="text" id="contact_name" class="input-box" placeholder="John Doe">
         </div>
 
         <div class="field-group">
@@ -128,10 +133,18 @@
     <!-- VIEW MODE -->
     <div id="viewMode" class="hidden">
       <div class="view-header">
-        <h1 id="viewName">Card Title</h1>
+        <h1 id="viewBusinessName">Business Name</h1>
       </div>
 
       <div class="view-body">
+        <div id="contactNameRow" class="action-item hidden">
+          <div class="action-icon"><i class="fa-solid fa-user" style="color: #0066eb;"></i></div>
+          <div class="action-details">
+            <div class="action-title">NAME</div>
+            <div id="viewContactName" class="action-value"></div>
+          </div>
+        </div>
+
         <div id="phoneRow" class="action-item hidden">
           <div class="action-icon"><i class="fa-solid fa-phone" style="color: #0066eb;"></i></div>
           <div class="action-details">
@@ -247,14 +260,21 @@
 
     function renderCardView(data) {
       document.getElementById('viewMode').classList.remove('hidden');
-      document.getElementById('viewName').innerText = data.name;
+      
+      const bName = data.business_name || data.name || 'Digital Card';
+      document.getElementById('viewBusinessName').innerText = bName;
+
+      if (data.contact_name) {
+        document.getElementById('contactNameRow').classList.remove('hidden');
+        document.getElementById('viewContactName').innerText = data.contact_name;
+      }
 
       if (data.phone) {
         document.getElementById('phoneRow').classList.remove('hidden');
         document.getElementById('viewPhone').innerText = data.phone;
         document.getElementById('callBtn').href = `tel:${data.phone}`;
         document.getElementById('mainCallBtn').href = `tel:${data.phone}`;
-        document.getElementById('mainCallBtn').innerText = `Call ${data.name}`;
+        document.getElementById('mainCallBtn').innerText = `Call ${bName}`;
       }
 
       if (data.whatsapp) {
@@ -327,7 +347,8 @@
 
       const payload = {
         uid: userId,
-        name: document.getElementById('name').value,
+        business_name: document.getElementById('business_name').value,
+        contact_name: document.getElementById('contact_name').value,
         phone: document.getElementById('phone').value,
         whatsapp: document.getElementById('whatsapp').value,
         facebook: document.getElementById('facebook').value,
