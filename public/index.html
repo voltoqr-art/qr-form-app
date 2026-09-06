@@ -67,18 +67,21 @@
       </div>
 
       <form id="contactForm" class="form-body">
-        <div class="section-divider">REQUIRED DETAILS</div>
+        <div class="section-divider">CARD INFORMATION</div>
 
+        <!-- 1. BUSINESS NAME (FIRST FIELD) -->
         <div class="field-group">
           <div class="field-label"><i class="fa-solid fa-briefcase" style="color: #0066eb;"></i> BUSINESS NAME <span class="required">*</span></div>
           <input type="text" id="business_name" class="input-box" placeholder="Company / Brand Name" required>
         </div>
 
+        <!-- 2. CONTACT NAME (SECOND FIELD) -->
         <div class="field-group">
           <div class="field-label"><i class="fa-solid fa-user" style="color: #0066eb;"></i> CONTACT NAME <span class="optional">(Optional)</span></div>
           <input type="text" id="contact_name" class="input-box" placeholder="John Doe">
         </div>
 
+        <!-- 3. PHONE NUMBER -->
         <div class="field-group">
           <div class="field-label"><i class="fa-solid fa-phone" style="color: #0066eb;"></i> PHONE NUMBER <span class="required">*</span></div>
           <input type="tel" id="phone" class="input-box" placeholder="01xxxxxxxxx" required>
@@ -132,11 +135,13 @@
 
     <!-- VIEW MODE -->
     <div id="viewMode" class="hidden">
+      <!-- Header displaying Business Name -->
       <div class="view-header">
         <h1 id="viewBusinessName">Business Name</h1>
       </div>
 
       <div class="view-body">
+        <!-- Contact Name appearing as the first row item -->
         <div id="contactNameRow" class="action-item hidden">
           <div class="action-icon"><i class="fa-solid fa-user" style="color: #0066eb;"></i></div>
           <div class="action-details">
